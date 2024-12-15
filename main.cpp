@@ -5,41 +5,41 @@
 
 using namespace std;
 
-// Класс описывает товар, который доступен на торговой площадке
+// Товар
 class Product {
 public:
     Product(const string& name, double price, int quantity, int seller_id)
             : name(name), price(price), quantity(quantity), seller_id(seller_id) {}
 
-    const string& getName() const { return name; } // Получить название товара
-    double getPrice() const { return price; } // Получить цену товара
-    int getQuantity() const { return quantity; } // Получить количество товара
-    int getSellerId() const { return seller_id; } // Получить идентификатор продавца
+    const string& getName() const { return name; }
+    double getPrice() const { return price; }
+    int getQuantity() const { return quantity; }
+    int getSellerId() const { return seller_id; }
 
-    void reduceQuantity(int amount) { quantity -= amount; } // Уменьшить количество товара на складе
+    void reduceQuantity(int amount) { quantity -= amount; }
 
 private:
-    string name; // Название товара
-    double price; // Цена товара
-    int quantity; // Количество товара на складе
-    int seller_id; // Идентификатор продавца
+    string name;
+    double price;
+    int quantity;
+    int seller_id;
 };
 
-// Класс описывает продавца на торговой площадке
+// Продавец
 class Seller {
 public:
     Seller(const string& name, int id) : name(name), id(id) {}
 
-    int getId() const { return id; } // Получить идентификатор продавца
-    const string& getName() const { return name; } // Получить имя продавца
+    int getId() const { return id; }
+    const string& getName() const { return name; }
 
     void addProduct(const shared_ptr<Product>& product) {
-        products.push_back(product); // Добавить товар в список продавца
+        products.push_back(product);
     }
 
 private:
-    string name; // Имя продавца
-    int id; // Уникальный идентификатор продавца
+    string name;
+    int id;
     vector<shared_ptr<Product>> products; // Список товаров продавца
 };
 
@@ -48,6 +48,7 @@ class PaymentStrategy {
 public:
     virtual ~PaymentStrategy() = default;
     virtual bool pay(double amount, double& balance) const = 0; // Метод оплаты
+    virtual const string& getName() const = 0; // Получить имя стратегии оплаты
 };
 
 // Реализация оплаты наличными
@@ -60,6 +61,11 @@ public:
         }
         return false; // Недостаточно средств
     }
+
+    const string& getName() const override { return name; }
+
+private:
+    string name = "CashPayment";
 };
 
 // Реализация оплаты картой
@@ -72,6 +78,11 @@ public:
         }
         return false; // Недостаточно средств
     }
+
+    const string& getName() const override { return name; }
+
+private:
+    string name = "CardPayment";
 };
 
 // Реализация оплаты криптовалютой
@@ -84,9 +95,14 @@ public:
         }
         return false; // Недостаточно средств
     }
+
+    const string& getName() const override { return name; }
+
+private:
+    string name = "CryptoPayment";
 };
 
-// Класс описывает покупателя
+// Покупатель
 class Customer {
 public:
     Customer(const string& name, double balance) : name(name), balance(balance) {}
@@ -97,26 +113,26 @@ public:
 
     bool buyProduct(shared_ptr<Product>& product, int quantity) {
         if (!payment_strategy) {
-            cout << "Payment method not set.\n";
+            cout << "Payment method not set." << endl;
             return false;
         }
 
         double total_cost = product->getPrice() * quantity; // Общая стоимость покупки
         if (product->getQuantity() >= quantity && payment_strategy->pay(total_cost, balance)) {
             product->reduceQuantity(quantity); // Уменьшить количество товара
-            cout << "Purchase successful!\n";
-            cout << "Receipt: " << product->getName() << " x" << quantity
-                 << " for " << total_cost << " using chosen payment method.\n";
-            cout << "Remaining balance: " << balance << "\n";
+            cout << "Successful!" << endl;
+            cout << "Buy: " << product->getName() << " x" << quantity
+                 << " for " << total_cost << " by using " << payment_strategy->getName() << endl;
+            cout << "Remaining balance: " << balance << endl;
             return true;
         }
-        cout << "Purchase failed.\n";
+        cout << "Purchase failed." << endl;
         return false; // Покупка не удалась
     }
 
 private:
-    string name; // Имя покупателя
-    double balance; // Баланс покупателя
+    string name;
+    double balance;
     shared_ptr<PaymentStrategy> payment_strategy; // Метод оплаты
 };
 
@@ -135,11 +151,11 @@ public:
         products.push_back(product); // Добавить товар
     }
 
-    void listProducts() const {
-        cout << "Available products:\n";
+    void printProducts() const { // Вывести информацию о товарах
+        cout << "Available products:" << endl;
         for (const auto& product : products) {
             cout << "- " << product->getName() << ", Price: " << product->getPrice()
-                 << ", Quantity: " << product->getQuantity() << "\n"; // Вывести информацию о товарах
+                 << ", Quantity: " << product->getQuantity() << endl;
         }
     }
 
@@ -159,30 +175,30 @@ private:
 };
 
 int main() {
-    Marketplace marketplace; // Создать торговую площадку
+    Marketplace marketplace;
 
-    auto seller1 = make_shared<Seller>("John's Store", 1); // Создать продавца
-    marketplace.addSeller(seller1); // Добавить продавца на площадку
+    auto seller1 = make_shared<Seller>("John's Store", 1);
+    marketplace.addSeller(seller1);
 
-    auto product1 = make_shared<Product>("Laptop", 1000.0, 5, seller1->getId()); // Создать товар
-    marketplace.addProduct(product1); // Добавить товар на площадку
+    auto product1 = make_shared<Product>("Laptop", 1000.0, 5, seller1->getId());
+    marketplace.addProduct(product1);
 
-    auto product2 = make_shared<Product>("Phone", 500.0, 10, seller1->getId()); // Создать товар
-    marketplace.addProduct(product2); // Добавить товар на площадку
+    auto product2 = make_shared<Product>("Phone", 500.0, 10, seller1->getId());
+    marketplace.addProduct(product2);
 
-    auto customer1 = make_shared<Customer>("Alice", 1500.0); // Создать покупателя
-    marketplace.addCustomer(customer1); // Добавить покупателя на площадку
+    auto customer1 = make_shared<Customer>("Alice", 1500.0);
+    marketplace.addCustomer(customer1);
 
-    customer1->setPaymentStrategy(make_shared<CashPayment>()); // Установить метод оплаты
+    customer1->setPaymentStrategy(make_shared<CashPayment>());
 
-    marketplace.listProducts(); // Вывести список доступных товаров
+    marketplace.printProducts();
 
-    auto selectedProduct = marketplace.findProduct("Laptop"); // Найти товар по имени
+    auto selectedProduct = marketplace.findProduct("Laptop");
     if (selectedProduct) {
-        customer1->buyProduct(selectedProduct, 1); // Покупатель совершает покупку
+        customer1->buyProduct(selectedProduct, 1);
     }
 
-    marketplace.listProducts(); // Вывести список товаров после покупки
+    marketplace.printProducts();
 
     return 0;
 }
