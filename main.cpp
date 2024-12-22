@@ -5,7 +5,6 @@
 
 using namespace std;
 
-// Базовый класс Товар
 class Product {
 public:
     Product(const string& name, double price, int quantity, int seller_id)
@@ -27,7 +26,6 @@ protected:
     int seller_id;
 };
 
-// Базовый класс Пользователь
 class User {
 public:
     User(const string& name, int id) : name(name), id(id) {}
@@ -41,7 +39,7 @@ protected:
     int id;
 };
 
-// Класс Продавец
+
 class Seller : public User {
 public:
     Seller(const string& name, int id) : User(name, id) {}
@@ -51,10 +49,9 @@ public:
     }
 
 private:
-    vector<shared_ptr<Product>> products; // Список товаров продавца
+    vector<shared_ptr<Product>> products;
 };
 
-// Базовый класс Стратегии оплаты
 class PaymentStrategy {
 public:
     virtual ~PaymentStrategy() = default;
@@ -62,7 +59,6 @@ public:
     virtual const string& getName() const = 0;
 };
 
-// Реализация оплаты наличными
 class CashPayment : public PaymentStrategy {
 public:
     bool pay(double amount, double& balance) const override {
@@ -79,7 +75,6 @@ private:
     string name = "CashPayment";
 };
 
-// Реализация оплаты картой
 class CardPayment : public PaymentStrategy {
 public:
     bool pay(double amount, double& balance) const override {
@@ -96,7 +91,6 @@ private:
     string name = "CardPayment";
 };
 
-// Реализация оплаты криптовалютой
 class CryptoPayment : public PaymentStrategy {
 public:
     bool pay(double amount, double& balance) const override {
@@ -113,7 +107,6 @@ private:
     string name = "CryptoPayment";
 };
 
-// Класс Покупатель
 class Customer : public User {
 public:
     Customer(const string& name, int id, double balance)
@@ -147,7 +140,6 @@ private:
     shared_ptr<PaymentStrategy> payment_strategy;
 };
 
-// Базовый класс Торговая площадка
 class Marketplace {
 public:
     virtual ~Marketplace() = default;
@@ -212,6 +204,7 @@ int main() {
     }
 
     marketplace.printProducts();
+
 
     return 0;
 }
